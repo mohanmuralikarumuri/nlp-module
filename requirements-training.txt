@@ -1,0 +1,29 @@
+# Training Requirements
+# Install with: pip install -r requirements-training.txt
+
+# Core dependencies
+transformers>=4.35.0
+torch>=2.0.0
+datasets>=2.14.0
+evaluate>=0.4.1
+
+# Metrics
+rouge-score>=0.1.2
+
+# Data processing (already in base requirements)
+pandas>=1.5.0
+numpy>=1.24.0
+
+# Monitoring and logging
+tensorboard>=2.15.0
+
+# Optional: for faster training
+accelerate>=0.25.0
+
+# Optional: for better performance
+sentencepiece>=0.1.99  # For T5 models
+protobuf>=3.20.0
+
+# Development
+jupyter>=1.0.0
+ipywidgets>=8.0.0
