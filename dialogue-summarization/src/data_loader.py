@@ -108,8 +108,8 @@ def load_train_data(data_path: str) -> pd.DataFrame:
     print(f"Columns: {list(df.columns)}")
     print(f"Sample data:")
     print(f"  - ID: {df['id'].iloc[0] if len(df) > 0 else 'N/A'}")
-    print(f"  - Dialogue preview: {df['dialogue'].iloc[0][:50] if len(df) > 0 else 'N/A'}...")
-    print(f"  - Summary preview: {df['summary'].iloc[0][:50] if len(df) > 0 else 'N/A'}...")
+    print(f"  - Dialogue preview: {str(df['dialogue'].iloc[0])[:50] if len(df) > 0 else 'N/A'}...")
+    print(f"  - Summary preview: {str(df['summary'].iloc[0])[:50] if len(df) > 0 else 'N/A'}...")
     
     return df
 
@@ -164,14 +164,14 @@ def load_test_data(data_path: str) -> pd.DataFrame:
     print(f"Has summary column: {has_summary}")
     print(f"Sample data:")
     print(f"  - ID: {df['id'].iloc[0] if len(df) > 0 else 'N/A'}")
-    print(f"  - Dialogue preview: {df['dialogue'].iloc[0][:50] if len(df) > 0 else 'N/A'}...")
-    if has_summary and len(df) > 0:
-        print(f"  - Summary preview: {df['summary'].iloc[0][:50] if df['summary'].iloc[0] else 'N/A'}...")
+    print(f"  - Dialogue preview: {str(df['dialogue'].iloc[0])[:50] if len(df) > 0 else 'N/A'}...")
+    if has_summary and len(df) > 0 and df['summary'].iloc[0]:
+        print(f"  - Summary preview: {str(df['summary'].iloc[0])[:50]}...")
     
     return df
 
 
-def create_data_loader(data_path, tokenizer, batch_size=8, shuffle=True):
+def create_data_loader(data_path: str, tokenizer, batch_size: int = 8, shuffle: bool = True):
     """
     Create a DataLoader for dialogue summarization dataset.
     
