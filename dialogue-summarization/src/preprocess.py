@@ -92,7 +92,7 @@ def remove_special_characters(text: str) -> str:
     # Keep: letters, numbers, spaces, newlines, and essential punctuation
     # Essential punctuation: . , ! ? ; : ' " - ( )
     # Also preserve colon for speaker names (e.g., "John: Hello")
-    text = re.sub(r'[^a-zA-Z0-9\s\n.,!?;:\'"()\-]', ' ', text)
+    text = re.sub(r'[^a-zA-Z0-9\s\n.,!?;:\'"()\\-]', ' ', text)
     # Clean up any multiple spaces created by removal
     text = re.sub(r' +', ' ', text)
     return text
@@ -236,15 +236,17 @@ def preprocess_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     df_clean = df.copy()
     
     # Preprocess dialogue column (required)
+    # Handle null values before processing
     # Use vectorized operation for efficiency
-    df_clean['dialogue'] = df_clean['dialogue'].astype(str).apply(
-        format_dialogue_for_transformer
+    df_clean['dialogue'] = df_clean['dialogue'].fillna('').apply(
+        lambda x: format_dialogue_for_transformer(str(x)) if x else x
     )
     
     # Preprocess summary column if it exists (optional)
     if 'summary' in df_clean.columns:
-        df_clean['summary'] = df_clean['summary'].astype(str).apply(
-            lambda x: clean_text(x) if x and str(x).strip() != '' else x
+        # Process summary, handling null values properly
+        df_clean['summary'] = df_clean['summary'].apply(
+            lambda x: clean_text(str(x)) if pd.notna(x) and str(x).strip() != '' else x
         )
     
     return df_clean
