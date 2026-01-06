@@ -239,7 +239,7 @@ def preprocess_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     # Handle null values before processing
     # Use vectorized operation for efficiency
     df_clean['dialogue'] = df_clean['dialogue'].fillna('').apply(
-        lambda x: format_dialogue_for_transformer(str(x)) if x else x
+        lambda x: format_dialogue_for_transformer(str(x)) if str(x).strip() else x
     )
     
     # Preprocess summary column if it exists (optional)
