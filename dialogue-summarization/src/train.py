@@ -91,21 +91,24 @@ class DialogueSummarizationDataset(Dataset):
         )
         
         # Prepare the item
+        # Use squeeze(0) to only remove the batch dimension (first dimension)
+        # This ensures proper shape even when batch size is 1
         item = {
-            'input_ids': model_inputs['input_ids'].squeeze(),
-            'attention_mask': model_inputs['attention_mask'].squeeze(),
-            'labels': labels['input_ids'].squeeze()
+            'input_ids': model_inputs['input_ids'].squeeze(0),
+            'attention_mask': model_inputs['attention_mask'].squeeze(0),
+            'labels': labels['input_ids'].squeeze(0)
         }
         
         return item
 
 
-def initialize_model(model_name: str = "facebook/bart-large-cnn"):
+def initialize_model(model_name: str = "t5-small"):
     """
     Initialize the summarization model and tokenizer.
     
     Loads a pretrained seq2seq model from Hugging Face model hub.
     Supports models like BART, T5, and other encoder-decoder architectures.
+    Default is t5-small for faster training and lower memory requirements.
     
     Args:
         model_name (str): Hugging Face model identifier
@@ -167,7 +170,7 @@ def load_and_preprocess_data(
 
 
 def train(
-    model_name: str = "facebook/bart-large-cnn",
+    model_name: str = "t5-small",
     train_data_path: str = "../data/samsum_train.csv",
     val_data_path: Optional[str] = None,
     output_dir: str = "../models/",
@@ -191,7 +194,8 @@ def train(
     - Saves the fine-tuned model
     
     Args:
-        model_name (str): Pretrained model identifier (bart-large-cnn or t5-small)
+        model_name (str): Pretrained model identifier (t5-small, bart-large-cnn, etc.)
+                         Default is t5-small for faster training and lower memory
         train_data_path (str): Path to training CSV file
         val_data_path (str, optional): Path to validation CSV file
         output_dir (str): Directory to save model checkpoints
@@ -274,7 +278,7 @@ def train(
         logging_steps=logging_steps,
         warmup_steps=warmup_steps,
         predict_with_generate=True,
-        fp16=torch.cuda.is_available(),  # Use mixed precision if GPU available
+        fp16=False,  # Disable FP16 by default for compatibility with all GPUs
         push_to_hub=False,  # Cloud-safe: don't push to hub
         report_to="none",  # Cloud-safe: disable external reporting
     )
