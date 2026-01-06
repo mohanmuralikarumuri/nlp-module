@@ -253,8 +253,9 @@ def batch_inference(
                     summary = "Summary not available."
                 summaries.append(summary)
         
-        # Progress indicator
-        if (i // batch_size + 1) % 10 == 0 or i + batch_size >= len(dialogues):
+        # Progress indicator: report every 10 batches or at the end
+        batch_num = (i // batch_size) + 1
+        if batch_num % 10 == 0 or i + batch_size >= len(dialogues):
             print(f"  Processed {min(i + batch_size, len(dialogues))}/{len(dialogues)} dialogues")
     
     print(f"✓ Completed inference for {len(summaries)} dialogues")
@@ -361,10 +362,10 @@ def run_inference(
         'summary': summaries
     })
     
-    # Ensure output directory exists (if output_path includes a directory)
-    # When output_dir is empty string, file will be saved in current directory
+    # Ensure output directory exists (only if output_path contains a directory component)
+    # e.g., "data/predictions.csv" creates "data/", but "predictions.csv" creates nothing
     output_dir = os.path.dirname(output_path)
-    if output_dir:  # Only create directory if output_path includes a directory component
+    if output_dir:
         os.makedirs(output_dir, exist_ok=True)
     
     # Save to CSV
