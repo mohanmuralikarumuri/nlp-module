@@ -66,37 +66,35 @@ class DialogueSummarizationDataset(Dataset):
         """
         Get a single training example.
         
+        Returns tokenized inputs and labels without padding.
+        Padding is handled dynamically by DataCollatorForSeq2Seq during batching.
+        
         Returns:
             dict: Dictionary with input_ids, attention_mask, and labels
         """
         dialogue = str(self.dialogues[idx])
         summary = str(self.summaries[idx])
         
-        # Tokenize input dialogue
+        # Tokenize input dialogue without padding (dynamic padding done by collator)
         model_inputs = self.tokenizer(
             dialogue,
             max_length=self.max_input_length,
-            padding='max_length',
             truncation=True,
-            return_tensors='pt'
         )
         
-        # Tokenize target summary
+        # Tokenize target summary without padding
         labels = self.tokenizer(
             summary,
             max_length=self.max_target_length,
-            padding='max_length',
             truncation=True,
-            return_tensors='pt'
         )
         
         # Prepare the item
-        # Use squeeze(0) to only remove the batch dimension (first dimension)
-        # This ensures proper shape even when batch size is 1
+        # DataCollatorForSeq2Seq will handle padding dynamically
         item = {
-            'input_ids': model_inputs['input_ids'].squeeze(0),
-            'attention_mask': model_inputs['attention_mask'].squeeze(0),
-            'labels': labels['input_ids'].squeeze(0)
+            'input_ids': model_inputs['input_ids'],
+            'attention_mask': model_inputs['attention_mask'],
+            'labels': labels['input_ids']
         }
         
         return item
