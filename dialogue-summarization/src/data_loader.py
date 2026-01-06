@@ -1,66 +1,17 @@
 """
 Data Loader Module for Dialogue Summarization
 
-This module handles loading and batching of dialogue-summary datasets.
+This module handles loading and validating CSV data for dialogue summarization.
 It provides utilities to:
 - Load training and test data from CSV files
-- Create PyTorch DataLoaders for efficient batching
-- Handle data transformations and tokenization
+- Validate data integrity (required columns, missing values)
+- Clean and prepare pandas DataFrames
+
+Note: Dataset creation and tokenization are handled separately in the training step.
+This module is intentionally cloud-safe and does not require PyTorch installation.
 """
 
-from typing import Optional, Tuple
 import pandas as pd
-
-try:
-    from torch.utils.data import Dataset, DataLoader
-    TORCH_AVAILABLE = True
-except ImportError:
-    TORCH_AVAILABLE = False
-    # Define dummy classes if torch is not available
-    class Dataset:
-        """Dummy Dataset class when torch is not available."""
-        pass
-    
-    class DataLoader:
-        """Dummy DataLoader class when torch is not available."""
-        pass
-
-
-class DialogueSummarizationDataset(Dataset):
-    """
-    Custom Dataset class for dialogue summarization task.
-    
-    Handles loading dialogues and summaries from CSV format and
-    preparing them for model training.
-    """
-    
-    def __init__(self, data_path, tokenizer=None):
-        """
-        Initialize the dataset.
-        
-        Args:
-            data_path (str): Path to the CSV file containing dialogues
-            tokenizer: Tokenizer instance for text encoding
-        """
-        self.data = pd.read_csv(data_path)
-        self.tokenizer = tokenizer
-    
-    def __len__(self):
-        """Return the total number of samples in the dataset."""
-        return len(self.data)
-    
-    def __getitem__(self, idx):
-        """
-        Get a single sample from the dataset.
-        
-        Args:
-            idx (int): Index of the sample to retrieve
-            
-        Returns:
-            dict: Dictionary containing dialogue and summary (if available)
-        """
-        # Implementation to be added
-        pass
 
 
 def load_train_data(data_path: str) -> pd.DataFrame:
@@ -169,32 +120,6 @@ def load_test_data(data_path: str) -> pd.DataFrame:
         print(f"  - Summary preview: {str(df['summary'].iloc[0])[:50]}...")
     
     return df
-
-
-def create_data_loader(data_path: str, tokenizer, batch_size: int = 8, shuffle: bool = True):
-    """
-    Create a DataLoader for dialogue summarization dataset.
-    
-    Args:
-        data_path (str): Path to the CSV data file
-        tokenizer: Tokenizer instance for text encoding
-        batch_size (int): Number of samples per batch
-        shuffle (bool): Whether to shuffle the data
-        
-    Returns:
-        DataLoader: PyTorch DataLoader instance
-        
-    Raises:
-        ImportError: If torch is not available in the environment
-    """
-    if not TORCH_AVAILABLE:
-        raise ImportError(
-            "PyTorch is not available. Please install torch to use create_data_loader. "
-            "Install with: pip install torch"
-        )
-    
-    dataset = DialogueSummarizationDataset(data_path, tokenizer)
-    return DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
 
 
 if __name__ == "__main__":
