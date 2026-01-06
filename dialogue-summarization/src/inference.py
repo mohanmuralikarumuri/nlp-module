@@ -27,6 +27,13 @@ from data_loader import load_test_data
 from preprocess import preprocess_dataframe
 
 
+# Constants for model inference
+MAX_INPUT_LENGTH = 512  # Maximum length for input dialogues
+NUM_BEAMS = 4  # Number of beams for beam search
+LENGTH_PENALTY = 1.0  # Length penalty for generation (neutral)
+NO_REPEAT_NGRAM_SIZE = 3  # Prevent repetition of n-grams
+
+
 def load_model(model_path: str, device: str = 'cpu') -> Tuple[AutoModelForSeq2SeqLM, AutoTokenizer]:
     """
     Load a trained model and tokenizer from checkpoint directory.
@@ -120,10 +127,9 @@ def generate_summary(
     # Use no_grad context for inference (no gradient computation needed)
     with torch.no_grad():
         # Tokenize input dialogue
-        # Use max_length of 512 to handle long dialogues (truncate if needed)
         inputs = tokenizer(
             dialogue,
-            max_length=512,
+            max_length=MAX_INPUT_LENGTH,
             truncation=True,
             padding=False,
             return_tensors='pt'
@@ -139,10 +145,10 @@ def generate_summary(
             attention_mask=inputs['attention_mask'],
             max_length=max_length,
             min_length=min_length,
-            num_beams=4,  # Beam search for better quality
-            length_penalty=1.0,  # Neutral length penalty
+            num_beams=NUM_BEAMS,
+            length_penalty=LENGTH_PENALTY,
             early_stopping=True,  # Stop when all beams finish
-            no_repeat_ngram_size=3,  # Avoid repetition
+            no_repeat_ngram_size=NO_REPEAT_NGRAM_SIZE,
         )
         
         # Decode generated tokens to text
@@ -211,7 +217,7 @@ def batch_inference(
             # Dynamic padding to longest in batch for efficiency
             inputs = tokenizer(
                 batch,
-                max_length=512,
+                max_length=MAX_INPUT_LENGTH,
                 truncation=True,
                 padding=True,  # Pad to longest in batch
                 return_tensors='pt'
@@ -226,10 +232,10 @@ def batch_inference(
                 attention_mask=inputs['attention_mask'],
                 max_length=max_length,
                 min_length=min_length,
-                num_beams=4,
-                length_penalty=1.0,
+                num_beams=NUM_BEAMS,
+                length_penalty=LENGTH_PENALTY,
                 early_stopping=True,
-                no_repeat_ngram_size=3,
+                no_repeat_ngram_size=NO_REPEAT_NGRAM_SIZE,
             )
             
             # Decode each summary in the batch
@@ -355,9 +361,10 @@ def run_inference(
         'summary': summaries
     })
     
-    # Ensure output directory exists
+    # Ensure output directory exists (if output_path includes a directory)
+    # When output_dir is empty string, file will be saved in current directory
     output_dir = os.path.dirname(output_path)
-    if output_dir:  # Only create directory if path includes a directory component
+    if output_dir:  # Only create directory if output_path includes a directory component
         os.makedirs(output_dir, exist_ok=True)
     
     # Save to CSV
