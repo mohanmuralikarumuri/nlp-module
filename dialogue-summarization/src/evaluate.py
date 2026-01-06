@@ -111,7 +111,7 @@ def compare_models(predictions_paths, model_names, references_path):
 if __name__ == "__main__":
     # Example usage
     predictions_path = '../data/predictions.csv'
-    references_path = '../data/train.csv'  # Assuming train.csv has reference summaries
+    references_path = '../data/validation.csv'  # Path to validation set with ground truth summaries
     
     scores = evaluate_model(predictions_path, references_path)
     print_evaluation_report(scores)

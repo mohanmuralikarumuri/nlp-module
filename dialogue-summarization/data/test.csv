@@ -1,3 +1,1 @@
-# Test dataset for dialogue summarization
-# Columns: dialogue_id, dialogue
-# This file should contain test dialogues without summaries for prediction
+dialogue_id,dialogue

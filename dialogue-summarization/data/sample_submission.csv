@@ -1,3 +1,1 @@
-# Sample submission format for dialogue summarization predictions
-# Columns: dialogue_id, summary
-# This file shows the expected format for submitting predictions
+dialogue_id,summary
