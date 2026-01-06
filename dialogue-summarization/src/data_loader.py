@@ -95,8 +95,8 @@ def load_train_data(data_path: str) -> pd.DataFrame:
     df = df.dropna(subset=['dialogue', 'summary'])
     
     # Handle empty strings - filter out rows with empty dialogue or summary
-    df = df[df['dialogue'].str.strip().astype(bool)]
-    df = df[df['summary'].str.strip().astype(bool)]
+    df = df[df['dialogue'].astype(str).str.strip() != '']
+    df = df[df['summary'].astype(str).str.strip() != '']
     
     # Reset index after filtering
     df = df.reset_index(drop=True)
@@ -145,7 +145,7 @@ def load_test_data(data_path: str) -> pd.DataFrame:
     df = df.dropna(subset=['dialogue'])
     
     # Handle empty strings - filter out rows with empty dialogue
-    df = df[df['dialogue'].str.strip().astype(bool)]
+    df = df[df['dialogue'].astype(str).str.strip() != '']
     
     # If summary column exists, handle it gracefully (but don't require it)
     if 'summary' in df.columns:
@@ -183,7 +183,16 @@ def create_data_loader(data_path, tokenizer, batch_size=8, shuffle=True):
         
     Returns:
         DataLoader: PyTorch DataLoader instance
+        
+    Raises:
+        ImportError: If torch is not available in the environment
     """
+    if not TORCH_AVAILABLE:
+        raise ImportError(
+            "PyTorch is not available. Please install torch to use create_data_loader. "
+            "Install with: pip install torch"
+        )
+    
     dataset = DialogueSummarizationDataset(data_path, tokenizer)
     return DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
 
