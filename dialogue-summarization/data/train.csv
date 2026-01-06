@@ -1,0 +1,3 @@
+# Training dataset for dialogue summarization
+# Columns: dialogue_id, dialogue, summary
+# This file should contain training examples with dialogues and their corresponding summaries

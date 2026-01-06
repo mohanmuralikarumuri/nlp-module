@@ -54,11 +54,8 @@ models/*.bin
 models/checkpoint-*/
 
 # Data files (keep structure but ignore large datasets)
-data/*.csv
-data/*.json
-data/*.txt
-data/*.parquet
-!data/sample_submission.csv
+# Note: starter template files (train.csv, test.csv, sample_submission.csv) are tracked
+# Add actual large data files to ignore as needed
 
 # Logs
 logs/
